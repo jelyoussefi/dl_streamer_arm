@@ -47,10 +47,12 @@ gstreamer: install-prequisitories
                git clone https://gitlab.freedesktop.org/gstreamer/gst-build.git && \
                cd gst-build && mkdir build && \
                meson build && \
-               cd build && ninja && \
+               cd build && ninja && 
+               sudo ninja install && \
 	       touch ${CURRENT_DIR}/gst-build/.done; \
         fi
 
+install: openvino gstreamer
 
 clean:
 	@$(call msg,Cleaning the prequisitories ...) 
