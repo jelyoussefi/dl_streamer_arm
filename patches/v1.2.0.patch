@@ -1,0 +1,62 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 5fe2838..b4221f6 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -52,13 +52,15 @@ macro(set_target_lib_version TARGET)
+     )
+ endmacro(set_target_lib_version)
+ 
+-if (NOT(BIN_FOLDER))
+-    if("${CMAKE_SIZEOF_VOID_P}" EQUAL "8")
+-        set (ARCH intel64)
+-    else()
+-        set (ARCH ia32)
++if(NOT BIN_FOLDER)
++    string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} ARCH)
++    if(ARCH STREQUAL "x86_64") 
++        set(ARCH intel64)
++    elseif(ARCH STREQUAL "i386")
++        set(ARCH ia32)
+     endif()
+-    set (BIN_FOLDER ${ARCH})
++
++    set(BIN_FOLDER ${ARCH})
+ endif()
+ 
+ set (CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/${BIN_FOLDER}/${CMAKE_BUILD_TYPE}/lib)
+@@ -97,7 +99,7 @@ endfunction(set_compile_flags)
+ ####################################
+ ## to use C/C++11
+ set (CMAKE_C_STANDARD 11)
+-set (CMAKE_CXX_STANDARD 11)
++#set (CMAKE_CXX_STANDARD 11)
+ set (CMAKE_POSITION_INDEPENDENT_CODE ON)
+ ####################################
+ 
+diff --git a/gst/CMakeLists.txt b/gst/CMakeLists.txt
+index 5b2aff7..216d551 100644
+--- a/gst/CMakeLists.txt
++++ b/gst/CMakeLists.txt
+@@ -16,6 +16,7 @@ if(${ENABLE_AUDIO_INFERENCE_ELEMENTS})
+     add_subdirectory(audio_inference_elements)
+ endif()
+ 
+-if (NOT (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64" OR ${CMAKE_SYSTEM_PROCESSOR} STREQUAL "arm"))
+-    add_subdirectory(gvaitttracer)
++string(TOLOWER ${CMAKE_SYSTEM_PROCESSOR} ARCH)
++if(ARCH STREQUAL "x86_64" OR ARCH STREQUAL "i386")
++	add_subdirectory(gvaitttracer)
+ endif()
+diff --git a/inference_backend/include/inference_backend/safe_arithmetic.h b/inference_backend/include/inference_backend/safe_arithmetic.h
+index c067d98..54d42a1 100644
+--- a/inference_backend/include/inference_backend/safe_arithmetic.h
++++ b/inference_backend/include/inference_backend/safe_arithmetic.h
+@@ -155,7 +155,4 @@ inline EnableIfSignedIntegralType<ReturnType> safe_convert(const ValueType value
+     return static_cast<ReturnType>(value);
+ }
+ 
+-template <typename Type>
+-inline Type safe_convert(const Type value) {
+-    return value;
+-}
++
